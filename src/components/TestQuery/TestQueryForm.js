@@ -15,11 +15,17 @@ import {
 const Step = Steps.Step;
 
 const parentColLayout = {
-  lg: {
-    span: 20
+  xxl: {
+    span: 10
   },
-  sm: {
-    span: 22
+  xl: {
+    span: 12
+  },
+  lg: {
+    span: 14
+  },
+  md: {
+    span: 18
   },
   xs: {
     span: 24
@@ -40,35 +46,35 @@ class TestQueryForm extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.getGasEstimate();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.loading && !nextProps.loading) {
-      if (nextProps.error) {
+  componentDidUpdate(prevProps) {
+    if (this.props.loading && !prevProps.loading) {
+      if (this.props.error) {
         // We had an error
         showMessage(
           'error',
-          `There was an error deploying the contract: ${nextProps.error}`,
+          `There was an error deploying the contract: ${this.props.error}`,
           8
         );
       }
     }
 
-    if (this.props.transaction !== nextProps.transaction) {
+    if (this.props.transaction !== prevProps.transaction) {
       showMessage(
         'info',
         TestQuerySuccess({
           network: this.props.network,
-          txHash: nextProps.transaction
+          txHash: this.props.transaction
         }),
         8
       );
     }
 
-    if (this.props.gas !== nextProps.gas) {
-      this.setState({ gas: nextProps.gas });
+    if (this.props.gas !== prevProps.gas) {
+      this.setState({ gas: this.props.gas });
     }
   }
 
@@ -176,14 +182,18 @@ class TestQueryForm extends Component {
 
     return (
       <div className="page">
-        <Row type="flex" justify="center">
-          <Col {...parentColLayout}>
+        <Row type="flex" justify="center" style={{ margin: '20px 0' }}>
+          <Col span={18}>
             <Steps current={currentStep} style={{ marginBottom: '40px' }}>
               <Step title="Introduction" />
               <Step title="Oracle Data Source" />
               <Step title="Oracle Query" />
               <Step title="Result" />
             </Steps>
+          </Col>
+        </Row>
+        <Row type="flex" justify="center">
+          <Col {...parentColLayout}>
             <StepAnimation direction={this.state.transitionDirection}>
               {steps.filter((step, index) => currentStep === index)[0]}
             </StepAnimation>

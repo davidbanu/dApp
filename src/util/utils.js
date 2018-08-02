@@ -1,7 +1,11 @@
+import { message } from 'antd';
 import store from '../store';
 import abi from 'human-standard-token-abi';
 
 import { NULL_ADDRESS } from '../constants';
+
+import moment from 'moment';
+
 
 /**
  *
@@ -44,6 +48,34 @@ export const calculateCollateral = function(
  * @param errorMessage
  * @return getMetamaskError
  */
+export const formatedTimeFrom = function(text) {
+  var now = moment();
+  var then = moment.unix(text);
+  var ago = '';
+  var ms = moment(then, 'DD/MM/YYYY HH:mm:ss').diff(
+    moment(now, 'DD/MM/YYYY HH:mm:ss')
+  );
+  if (ms < 0) {
+    ms = moment(now, 'DD/MM/YYYY HH:mm:ss').diff(
+      moment(then, 'DD/MM/YYYY HH:mm:ss')
+    );
+    ago = ' ago';
+  }
+
+  var d = moment.duration(ms);
+
+  return [
+    d.days(),
+    'd ',
+    d.hours(),
+    'h ',
+    d.minutes(),
+    'm ',
+    d.days() < 1 ? d.seconds() : '',
+    d.days() < 1 ? 's ' : '',
+    ago
+  ].join('');
+};
 export const getMetamaskError = function(errorMessage) {
   if (errorMessage.indexOf('User denied transaction') !== -1)
     return 'User denied transaction';
@@ -175,4 +207,22 @@ export const getContractAddress = (contract, networkId) => {
   return contract.networks[networkId]
     ? contract.networks[networkId].address
     : NULL_ADDRESS;
+};
+
+/**
+ * Copies supplied text to the clipboard
+ * @param {string} text
+ */
+export const copyTextToClipboard = text => {
+  let textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    message.success('Copied successfully to clipboard');
+  } catch (err) {
+    console.log('Unable to copy the contract address to clipboard');
+  }
+  document.body.removeChild(textArea);
 };
